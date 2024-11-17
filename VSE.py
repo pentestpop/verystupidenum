@@ -129,25 +129,25 @@ def run_command(command, log_file, stop_animation):
 def prompt_for_input():
     pink = rgb_to_ansi("F686BD")
     reset = "\033[0m"
-    print(f"\n{pink}[*] Please provide the following information:{reset}")
+    print(f"\n{pink}[*] Please provide the following information, assuming you can even read:{reset}")
     
     # Required inputs
     domain = input(f"{pink}Domain (required): {reset}").strip()
     while not domain:
-        print(f"{pink}Domain is required!{reset}")
+        print(f"{pink}Domain is required dumbass!{reset}")
         domain = input(f"{pink}Domain (required): {reset}").strip()
     
     ip = input(f"{pink}IP Address (required): {reset}").strip()
     while not ip:
-        print(f"{pink}IP Address is required!{reset}")
+        print(f"{pink}IP Address is required dumbass!{reset}")
         ip = input(f"{pink}IP Address (required): {reset}").strip()
     
     # Optional DC-IP
     dc_ip = input(f"{pink}DC-IP (optional, press Enter to skip): {reset}").strip()
     
     # User authentication
-    print(f"\n{pink}User Authentication (choose one):{reset}")
-    print(f"{pink}1. Single username{reset}")
+    print(f"\n{pink}User Authentication (choose one idiot):{reset}")
+    print(f"{pink}1. Single valid username{reset}")
     print(f"{pink}2. User list file{reset}")
     user_choice = input(f"{pink}Enter choice (1/2): {reset}").strip()
     
@@ -166,8 +166,8 @@ def prompt_for_input():
             userlist = input(f"{pink}Please enter a valid file path: {reset}").strip()
     
     # Password authentication
-    print(f"\n{pink}Password Authentication (choose one):{reset}")
-    print(f"{pink}1. Single password{reset}")
+    print(f"\n{pink}Password Authentication (pick one doofus):{reset}")
+    print(f"{pink}1. Single valid password{reset}")
     print(f"{pink}2. Password list file{reset}")
     pass_choice = input(f"{pink}Enter choice (1/2): {reset}").strip()
     
