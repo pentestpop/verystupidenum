@@ -103,7 +103,79 @@ def log_command(log_file, command, output):
         f.write(f"{'='*50}\n")
         f.write(output)
         f.write("\n")
-        
+
+def prompt_for_input():
+    pink = rgb_to_ansi("F686BD")
+    reset = "\033[0m"
+    print(f"\n{pink}[*] Please provide the following information:{reset}")
+    
+    # Required inputs
+    domain = input(f"{pink}Domain (required): {reset}").strip()
+    while not domain:
+        print(f"{pink}Domain is required!{reset}")
+        domain = input(f"{pink}Domain (required): {reset}").strip()
+    
+    ip = input(f"{pink}IP Address (required): {reset}").strip()
+    while not ip:
+        print(f"{pink}IP Address is required!{reset}")
+        ip = input(f"{pink}IP Address (required): {reset}").strip()
+    
+    # Optional DC-IP
+    dc_ip = input(f"{pink}DC-IP (optional, press Enter to skip): {reset}").strip()
+    
+    # User authentication
+    print(f"\n{pink}User Authentication (choose one):{reset}")
+    print(f"{pink}1. Single username{reset}")
+    print(f"{pink}2. User list file{reset}")
+    user_choice = input(f"{pink}Enter choice (1/2): {reset}").strip()
+    
+    username = None
+    userlist = None
+    while user_choice not in ['1', '2']:
+        user_choice = input(f"{pink}Please enter 1 or 2: {reset}").strip()
+    
+    if user_choice == '1':
+        username = input(f"{pink}Username: {reset}").strip()
+        while not username:
+            username = input(f"{pink}Username cannot be empty: {reset}").strip()
+    else:
+        userlist = input(f"{pink}Path to user list file: {reset}").strip()
+        while not userlist or not os.path.exists(userlist):
+            userlist = input(f"{pink}Please enter a valid file path: {reset}").strip()
+    
+    # Password authentication
+    print(f"\n{pink}Password Authentication (choose one):{reset}")
+    print(f"{pink}1. Single password{reset}")
+    print(f"{pink}2. Password list file{reset}")
+    pass_choice = input(f"{pink}Enter choice (1/2): {reset}").strip()
+    
+    password = None
+    passwordlist = None
+    while pass_choice not in ['1', '2']:
+        pass_choice = input(f"{pink}Please enter 1 or 2: {reset}").strip()
+    
+    if pass_choice == '1':
+        password = input(f"{pink}Password: {reset}").strip()
+        while not password:
+            password = input(f"{pink}Password cannot be empty: {reset}").strip()
+    else:
+        passwordlist = input(f"{pink}Path to password list file: {reset}").strip()
+        while not passwordlist or not os.path.exists(passwordlist):
+            passwordlist = input(f"{pink}Please enter a valid file path: {reset}").strip()
+    
+    return {
+        'domain': domain,
+        'ip': ip,
+        'dc_ip': dc_ip,
+        'username': username,
+        'userlist': userlist,
+        'password': password,
+        'passwordlist': passwordlist
+    }
+
+#!/usr/bin/python3
+[Previous imports and helper functions remain the same until run_command]
+
 def run_commands(commands, log_file, stop_animation):
     """Execute multiple commands and log output"""
     pink = rgb_to_ansi("F686BD")
