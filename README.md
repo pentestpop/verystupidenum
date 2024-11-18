@@ -6,7 +6,7 @@ Sometimes I don't remember which Impacket script to use as I do Pentest Labs, an
 
 Pros: It easy.
 
-Cons: Someone might see you, and if you live in an at-will state, you could be fired. 
+Cons: Someone might see you and think you're a fraud, and they'll be right. 
 
 ## Usage
 This script *prompts you* for Domaoin, IP, dc-ip, user or userlist, and password or passwordlist, and then runs commands based on what you gave it with these four scenarios:
