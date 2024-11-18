@@ -55,7 +55,7 @@ def log_command(log_file, command, output):
 def prompt_for_input():
     pink = rgb_to_ansi("F686BD")
     reset = "\033[0m"
-    print(f"\n{pink}[*] Please provide the following information:{reset}")
+    print(f"\n{pink}[*] Hey dingus, please provide the following information:{reset}")
     
     # Required inputs
     domain = input(f"{pink}Domain (required): {reset}").strip()
@@ -72,7 +72,7 @@ def prompt_for_input():
     dc_ip = input(f"{pink}DC-IP (optional, press Enter to skip): {reset}").strip()
     
     # User authentication
-    print(f"\n{pink}User Authentication (choose one):{reset}")
+    print(f"\n{pink}User Authentication (choose one idiot):{reset}")
     print(f"{pink}1. Single username{reset}")
     print(f"{pink}2. User list file{reset}")
     user_choice = input(f"{pink}Enter choice (1/2): {reset}").strip()
@@ -92,7 +92,7 @@ def prompt_for_input():
             userlist = input(f"{pink}Please enter a valid file path: {reset}").strip()
     
     # Password authentication
-    print(f"\n{pink}Password Authentication (choose one):{reset}")
+    print(f"\n{pink}Password Authentication (pick one dummy):{reset}")
     print(f"{pink}1. Single password{reset}")
     print(f"{pink}2. Password list file{reset}")
     pass_choice = input(f"{pink}Enter choice (1/2): {reset}").strip()
