@@ -37,53 +37,6 @@ def print_title():
     print(" "*20 + "Starting Enumeration...")
     print("="*60 + "\n")
 
-def loading_animation():
-    frames = [
-        """
-        ⠋
-        """,
-        """
-        ⠙
-        """,
-        """
-        ⠹
-        """,
-        """
-        ⠸
-        """,
-        """
-        ⠼
-        """,
-        """
-        ⠴
-        """,
-        """
-        ⠦
-        """,
-        """
-        ⠧
-        """,
-        """
-        ⠇
-        """,
-        """
-        ⠏
-        """
-    ]
-    return frames
-
-def animate(stop):
-    frames = loading_animation()
-    pink = rgb_to_ansi("F686BD")
-    reset = "\033[0m"
-    while not stop.is_set():
-        for frame in frames:
-            if stop.is_set():
-                break
-            sys.stdout.write(f'\r{pink}{frame}{reset}')
-            sys.stdout.flush()
-            time.sleep(0.1)
-
 def setup_logging(domain, ip):
     """Setup logging directory and file"""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -267,31 +220,22 @@ def main():
     
     # Determine scenario and run appropriate commands
     if inputs['username'] and inputs['password']:
-        animation_thread = threading.Thread(target=animate, args=(stop_animation,))
-        animation_thread.start()
         commands = get_scenario_1_commands(inputs)
         print(f"\n{pink}[*] Running Scenario 1: Single username and password{reset}")
         
     elif inputs['username'] and inputs['passwordlist']:
-        animation_thread = threading.Thread(target=animate, args=(stop_animation,))
-        animation_thread.start()
         commands = get_scenario_2_commands(inputs)
         print(f"\n{pink}[*] Running Scenario 2: Single username with password list{reset}")
         
     elif inputs['userlist'] and inputs['password']:
-        animation_thread = threading.Thread(target=animate, args=(stop_animation,))
-        animation_thread.start()
         commands = get_scenario_3_commands(inputs)
         print(f"\n{pink}[*] Running Scenario 3: User list with single password{reset}")
         
     elif inputs['userlist'] and inputs['passwordlist']:
-        animation_thread = threading.Thread(target=animate, args=(stop_animation,))
-        animation_thread.start()
         commands = get_scenario_4_commands(inputs)
         print(f"\n{pink}[*] Running Scenario 4: User list with password list{reset}")
 
-    run_commands(commands, log_file, stop_animation)
-    stop_animation.set()
+run_commands(commands, log_file)
     print(f"\n{pink}[*] Enumeration completed!{reset}")
 
 if __name__ == "__main__":
