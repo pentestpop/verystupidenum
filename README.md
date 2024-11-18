@@ -9,11 +9,11 @@ Pros: It easy.
 Cons: Someone might see you and think you're a fraud, and they'll be right. 
 
 ## Usage
-This script *prompts you* for Domaoin, IP, dc-ip, user or userlist, and password or passwordlist, and then runs commands based on what you gave it with these four scenarios:
-1. valid user and password
-2. valid user and password list
-3. user list and valid password
-4. user list and password list (good luck dummy)
+This script *prompts you* for Domain, IP, dc-ip, user or userlist, and password or passwordlist, and then runs commands based on what you gave it with these four scenarios:
+1. Scenario 1 - valid user and password
+2. Scenario 2 - valid user and password list
+3. Scenario 3 - user list and valid password
+4. Scenario 4 - user list and password list (good luck dummy)
 
 You probably don't want to run this with long lists, use something else for that. It will run a bunch of commands, and then send the output to a file. Here are the commands that it runs based on each of the scenarios:
 
