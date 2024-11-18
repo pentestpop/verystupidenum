@@ -173,9 +173,6 @@ def prompt_for_input():
         'passwordlist': passwordlist
     }
 
-#!/usr/bin/python3
-[Previous imports and helper functions remain the same until run_command]
-
 def run_commands(commands, log_file, stop_animation):
     """Execute multiple commands and log output"""
     pink = rgb_to_ansi("F686BD")
