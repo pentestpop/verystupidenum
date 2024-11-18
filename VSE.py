@@ -37,14 +37,9 @@ def print_title():
     print(" "*20 + "Starting Enumeration...")
     print("="*60 + "\n")
 
-def setup_logging(domain, ip):
-    """Setup logging directory and file"""
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_dir = "enum_logs"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    
-    log_file = f"{log_dir}/enum_{domain}_{ip}_{timestamp}.log"
+def setup_logging(ip):
+    """Setup logging file"""
+    log_file = f"verystupid_{ip}.txt"
     return log_file
 
 def log_command(log_file, command, output):
@@ -210,7 +205,7 @@ def main():
     inputs = prompt_for_input()
     
     # Setup logging
-    log_file = setup_logging(inputs['domain'], inputs['ip'])
+    log_file = setup_logging(inputs['ip'])
     pink = rgb_to_ansi("F686BD")
     reset = "\033[0m"
     print(f"\n{pink}[*] Starting enumeration. Log file: {reset}{log_file}")
@@ -234,7 +229,7 @@ def main():
         
     elif inputs['userlist'] and inputs['passwordlist']:
         commands = get_scenario_4_commands(inputs)
-        print(f"\n{pink}[*] Running Scenario 4: User list with password list{reset}")
+        print(f"\n{pink}[*] Running Scenario 4: No creds{reset}")
 
     run_commands(commands, log_file)
     print(f"\n{pink}[*] Enumeration completed!{reset}")
