@@ -126,7 +126,7 @@ def prompt_for_input():
         'passwordlist': passwordlist
     }
 
-def run_commands(commands, log_file, stop_animation):
+def run_commands(commands, log_file):
     """Execute multiple commands and log output"""
     pink = rgb_to_ansi("F686BD")
     reset = "\033[0m"
@@ -216,9 +216,10 @@ def main():
     print(f"\n{pink}[*] Starting enumeration. Log file: {reset}{log_file}")
     
     # Setup animation stop event
-    stop_animation = threading.Event()
+    #stop_animation = threading.Event()
     
     # Determine scenario and run appropriate commands
+# Determine scenario and run appropriate commands
     if inputs['username'] and inputs['password']:
         commands = get_scenario_1_commands(inputs)
         print(f"\n{pink}[*] Running Scenario 1: Single username and password{reset}")
@@ -235,7 +236,7 @@ def main():
         commands = get_scenario_4_commands(inputs)
         print(f"\n{pink}[*] Running Scenario 4: User list with password list{reset}")
 
-run_commands(commands, log_file)
+    run_commands(commands, log_file)
     print(f"\n{pink}[*] Enumeration completed!{reset}")
 
 if __name__ == "__main__":
